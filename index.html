@@ -8,26 +8,26 @@
 </head>
 <body>
 
-    <div class="container">
+    <div class="glass-container">
         
         <div id="adminSection">
             <h1 id="gameTitle">🎭 یاری بڕیاردانی چارەنووسساز</h1>
-            <p class="subtitle" id="gameSubtitle">ئەم وێبسایتە پرسیارێک بە AI دروست دەکات یان خۆت بیننووسە و بۆ هاوڕێکانتی بنێرە!</p>
+            <p class="subtitle" id="gameSubtitle">پرسیارێک بنووسە یان بە AI دروستی بکە و بۆ هاوڕێکانتی بنێرە!</p>
 
             <div class="friends-grid" id="friendsGrid">
-                <div class="friend-card">اسماعیل</div>
-                <div class="friend-card">شەنیار</div>
-                <div class="friend-card">لێزان</div>
-                <div class="friend-card">سۆنیا</div>
-                <div class="friend-card">شەهین</div>
-                <div class="friend-card">عبدالباست</div>
-                <div class="friend-card">ڕاز</div>
+                <div class="friend-card animate-card">اسماعیل</div>
+                <div class="friend-card animate-card">شەنیار</div>
+                <div class="friend-card animate-card">لێزان</div>
+                <div class="friend-card animate-card">سۆنیا</div>
+                <div class="friend-card animate-card">شەهین</div>
+                <div class="friend-card animate-card">عبدالباست</div>
+                <div class="friend-card animate-card">ڕاز</div>
             </div>
 
             <div class="input-section">
-                <textarea id="questionInput" placeholder="پرسیارەکەت لێرە بنووسە یان کلیک لە دوگمەی خوارەوە بکە... 🤔"></textarea>
+                <textarea id="questionInput" placeholder="پرسیارەکەت لێرە بنووسە یان بە دوگمەی خوارەوە بە AI دروستی بکە... 🤔"></textarea>
                 <button id="mainBtn" onclick="generateAIQuestion()">🧠 ١. دروستکردنی پرسیار بە AI</button>
-                <button id="sendBtn" onclick="sendQuestionToAll()" style="margin-top: 12px; background: linear-gradient(135deg, #22c55e 0%, #15803d 100%); box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);">🚀 ٢. ناردنی لینک بۆ هەر ٧ هاوڕێکە</button>
+                <button id="sendBtn" onclick="sendQuestionToAll()">🚀 ٢. ناردنی لینک بۆ هەر ٧ هاوڕێکە</button>
             </div>
         </div>
 
@@ -38,8 +38,22 @@
             <div class="question-display" id="displayQuestion"></div>
             
             <div class="input-section">
-                <textarea id="answerInput" placeholder="وەڵامەکەت لێرە بنووسە... ✍️"></textarea>
-                <button id="submitBtn" onclick="submitFriendAnswer()">📤 ناردنی وەڵام</button>
+                <label class="input-label">🎯 کێ هەڵدەبژێریت لە گروپەکە؟</label>
+                <select id="votedFriendSelect" class="glass-select">
+                    <option value="" disabled selected>--- هاوڕێیەک هەڵبژێره ---</option>
+                    <option value="اسماعیل">اسماعیل</option>
+                    <option value="شەنیار">شەنیار</option>
+                    <option value="لێزان">لێزان</option>
+                    <option value="سۆنیا">سۆنیا</option>
+                    <option value="شەهین">شەهین</option>
+                    <option value="عبدالباست">عبدالباست</option>
+                    <option value="ڕاز">ڕاز</option>
+                </select>
+
+                <label class="input-label">✍️ بۆچی ئەم کەسەت هەڵبژارد؟ (هۆکارەکەی)</label>
+                <textarea id="reasonInput" placeholder="لێرە بنووسە بۆچی شایەنی ئەم بڕیارەیە... 💭"></textarea>
+                
+                <button id="submitBtn" onclick="submitFriendAnswer()">📤 ناردنی وەڵام و هۆکار بۆ AI</button>
             </div>
         </div>
 
