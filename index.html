@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎭 یاری بڕیاردانی چارەنووسساز</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1 id="gameTitle">🎭 یاری بڕیاردانی چارەنووسساز</h1>
+        <p class="subtitle" id="gameSubtitle">ئەم وێبسایتە پرسیارێکی نایاب بە AI دروست دەکات و بۆ هاوڕێکانتی دەنێرێت!</p>
+
+        <div class="friends-grid" id="friendsGrid">
+            <div class="friend-card">اسماعیل</div>
+            <div class="friend-card">شەنیار</div>
+            <div class="friend-card">لێزان</div>
+            <div class="friend-card">سۆنیا</div>
+            <div class="friend-card">شەهین</div>
+            <div class="friend-card">عبدالباست</div>
+            <div class="friend-card">ڕاز</div>
+        </div>
+
+        <div class="input-section">
+            <textarea id="questionInput" placeholder="پرسیاری دروستکراو لێرە دەردەکەوێت... 🤔" readonly></textarea>
+            <button id="mainBtn" onclick="generateAIQuestion()">🧠 ١. دروستکردنی پرسیار بە AI</button>
+            <button id="sendBtn" onclick="sendQuestionToAll()" style="display: none; margin-top: 10px; background: linear-gradient(135deg, #22c55e 0%, #15803d 100%); box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);">🚀 ٢. ناردنی لینک بۆ هەر ٧ هاوڕێکە</button>
+        </div>
+
+        <div id="statusMessage" class="status-box"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
