@@ -2,7 +2,13 @@ const BOT_TOKEN = '8329299504:AAFQbJKcvsEZQzyOwgD5G7eJJRaU810hmpI';
 const PIPEDREAM_WEBHOOK_URL = 'https://eonpq38cwigxpcf.m.pipedream.net'; 
 
 const FRIENDS = [
-    { name: "اسماعیل", id: "8471929492" }
+    { name: "سۆنیا", id: "8356643097" },
+    { name: "عبدالباست", id: "8094239190" },
+    { name: "شەهین", id: "8294302530" },
+    { name: "شەنیار", id: "5285811533" },
+    { name: "ڕاز", id: "6675931933" },
+    { name: "اسماعیل", id: "8471929492" },
+    { name: "لێزان", id: "5901076708" }
 ];
 
 module.exports = async (req, res) => {
