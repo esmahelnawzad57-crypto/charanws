@@ -1,11 +1,29 @@
-// script.js - کۆدی ڕێکخراو بۆ کارپێکردنی دوگمەکانی وێبسایتەکە
+let currentFriendName = "";
+let currentQuestion = "";
 
-// ١. ئەگەر ویستت AI پرسیارێکت بۆ پێشنیاز بکات (دوگمەی یەکەم)
+// کاتێک پەیجەکە دەکرێتەوە، پشکنین دەکات بزانێت کێ کردوویەتیەوە
+window.onload = function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const qParam = urlParams.get('q'); // گرتنی پرسیارەکە
+    const nParam = urlParams.get('n'); // گرتنی ناوی هاوڕێکە (n وەک ئەوەی لە API نووسیوتە)
+
+    if (qParam && nParam) {
+        // ئەگەر هاوڕێیەک بێت: شاشەی ئەدمین دەشارێتەوە و شاشەی هاوڕێ پیشان دەدات
+        document.getElementById('adminSection').style.display = 'none';
+        document.getElementById('friendSection').style.display = 'block';
+        
+        currentFriendName = decodeURIComponent(nParam);
+        currentQuestion = decodeURIComponent(qParam);
+        
+        document.getElementById('friendGreeting').innerText = `سڵاو لە تۆ (${currentFriendName}) 👋`;
+        document.getElementById('displayQuestion').innerText = currentQuestion;
+    }
+};
+
+// ١. دروستکردنی پرسیار بە AI
 async function generateAIQuestion() {
     const questionInput = document.getElementById('questionInput');
-    const sendBtn = document.getElementById('sendBtn');
-    
-    if (questionInput) questionInput.value = "🚨 AI خەریکە بیر دەکاتەوە و پرسیار دروست دەکات...";
+    if (questionInput) questionInput.value = "🚨 AI خەریکە بیر دەکاتەوە...";
 
     try {
         const response = await fetch('/api/game', {
@@ -14,35 +32,29 @@ async function generateAIQuestion() {
             body: JSON.stringify({ action: 'generate_question' })
         });
         const data = await response.json();
-        
         if (data.question) {
             questionInput.value = data.question;
-            // کاتێک پرسیارەکە ئامادە بوو، دوگمەی دووەم (ناردن) پیشان دەدات
-            if (sendBtn) sendBtn.style.display = 'block';
         } else {
-            alert('کێشەیەک لە دروستکردنی پرسیار هەبوو لە لایەن AI.');
+            alert('کێشەیەک لە دروستکردنی پرسیار هەبوو.');
         }
     } catch (error) {
-        alert('کێشەیەک لە پەیوەندیگرتن بە سێرڤەر هەبوو.');
+        alert('پەیوەندی لەگەڵ سێرڤەر سەرکەوتوو نەبوو.');
     }
 }
 
-// ٢. ناردنی پرسیارەکە بۆ هەر ٧ هاوڕێکەت (چ خۆت نووسیبێتت یان AI دروستی کردبێت)
+// ٢. ناردنی پرسیار بۆ هاوڕێکان لە تێلێگرام
 async function sendQuestionToAll() {
     const questionText = document.getElementById('questionInput').value.trim();
     const statusBox = document.getElementById('statusMessage');
     
-    // ڕێگری دەکات لە ناردنی دەقی بەتاڵ
     if (!questionText || questionText.startsWith("🚨")) {
-        alert("تکایە سەرەتا پرسیارێک بنووسە یان کلیک لە دروستکردنی پرسیار بە AI بکە!");
+        alert("تکایە سەرەتا پرسیارێک بنووسە یان بە AI دروستی بکە!");
         return;
     }
 
-    if (statusBox) {
-        statusBox.style.display = "block";
-        statusBox.className = "status-box info";
-        statusBox.innerText = "⏳ خەریکە لینکەکان بۆ هەر ٧ هاوڕێکەت دەنێردرێت لە تێلێگرام...";
-    }
+    statusBox.style.display = "block";
+    statusBox.className = "status-box info";
+    statusBox.innerText = "⏳ لینکەکان خەریکە دەنێردرێن بۆ تێلێگرام...";
 
     try {
         const response = await fetch('/api/game', {
@@ -53,20 +65,56 @@ async function sendQuestionToAll() {
         const data = await response.json();
         
         if (data.success) {
-            if (statusBox) {
-                statusBox.className = "status-box success";
-                statusBox.innerText = "✅ لینکەکان بە سەرکەوتوویی بۆ هەر ٧ هاوڕێکەت نێردران لە تێلێگرام!";
-            }
+            statusBox.className = "status-box success";
+            statusBox.innerText = "✅ لینکەکان بە سەرکەوتوویی بۆ تێلێگرام نێردران!";
         } else {
-            if (statusBox) {
-                statusBox.className = "status-box error";
-                statusBox.innerText = "❌ کێشەیەک ڕوویدا لە ناردنی نامەکان بۆ تێلێگرام.";
-            }
+            statusBox.className = "status-box error";
+            statusBox.innerText = "❌ کێشەیەک لە ناردندا هەبوو.";
         }
     } catch (error) {
-        if (statusBox) {
+        statusBox.className = "status-box error";
+        statusBox.innerText = "❌ پەیوەندی بە سێرڤەرەوە نەکرا.";
+    }
+}
+
+// ٣. کاتێک هاوڕێیەک وەڵام دەداتەوە و دەنێردرێت بۆ Pipedream
+async function submitFriendAnswer() {
+    const answerText = document.getElementById('answerInput').value.trim();
+    const statusBox = document.getElementById('statusMessage');
+    
+    if (!answerText) {
+        alert("تکایە وەڵامەکەت بنووسە!");
+        return;
+    }
+
+    statusBox.style.display = "block";
+    statusBox.className = "status-box info";
+    statusBox.innerText = "⏳ وەڵامەکەت خەریکە تۆمار دەکرێت...";
+
+    try {
+        const response = await fetch('/api/game', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                action: 'submit_answer', 
+                friendName: currentFriendName, 
+                origQuestion: currentQuestion, 
+                answer: answerText 
+            })
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            statusBox.className = "status-box success";
+            statusBox.innerText = "🎉 سوپاس! وەڵامەکەت بە سەرکەوتوویی نێردرا.";
+            document.getElementById('answerInput').disabled = true;
+            document.getElementById('submitBtn').disabled = true;
+        } else {
             statusBox.className = "status-box error";
-            statusBox.innerText = "❌ نەتوانرا پەیوەندی بە سێرڤەری ڤێرسێلەوە بکرێت.";
+            statusBox.innerText = "❌ ناردنی وەڵامەکە سەرکەوتوو نەبوو.";
         }
+    } catch (error) {
+        statusBox.className = "status-box error";
+        statusBox.innerText = "❌ کێشەی هێڵ هەیە، دووبارە تاقیکەرەوە.";
     }
 }
