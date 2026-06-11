@@ -1,27 +1,34 @@
-// script.js - ئەمە کۆدی ڕاستەقینەی ناو شاشەکەیە بۆ کارپێکردنی دوگمەکان
-
+// script.js
 let generatedQuestion = "";
 
-// کاتێک کلیک لەسەر دوگمەی دروستکردنی پرسیار دەکرێت
-document.querySelector('.btn-primary')?.addEventListener('click', async () => {
-    const questionBox = document.querySelector('.question-box p');
-    if (questionBox) questionBox.innerText = "🚨 AI خەریکە بیر دەکاتەوە...";
+// کاتێک کلیک لە دوگمەی دروستکردنی پرسیار دەکرێت
+document.addEventListener('DOMContentLoaded', () => {
+    // دۆزینەوەی دوگمەی پرسیار لە ڕێگەی دەقەکەیەوە
+    const actionBtn = Array.from(document.querySelectorAll('button')).find(el => el.textContent.includes('دروستکردنی پرسیار'));
+    const questionText = document.querySelector('.question-box p') || document.querySelector('.question-box');
 
-    try {
-        const response = await fetch('/api/game', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'generate_question' })
+    if (actionBtn) {
+        actionBtn.addEventListener('click', async () => {
+            if (questionText) questionText.innerText = "🚨 AI خەریکە بیر دەکاتەوە...";
+
+            try {
+                const response = await fetch('/api/game', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'generate_question' })
+                });
+                const data = await response.json();
+                
+                if (data.question) {
+                    generatedQuestion = data.question;
+                    if (questionText) questionText.innerText = generatedQuestion;
+                } else {
+                    if (questionText) questionText.innerText = "❌ کێشەیەک لە وەرگرتنی پرسیار هەبوو.";
+                }
+            } catch (error) {
+                if (questionText) questionText.innerText = "❌ نەتوانرا پەیوەندی بە باکەندەوە بکرێت.";
+                console.error(error);
+            }
         });
-        const data = await response.json();
-        
-        if (data.question) {
-            generatedQuestion = data.question;
-            if (questionBox) questionBox.innerText = generatedQuestion;
-        } else {
-            alert('کێشەیەک لە دروستکردنی پرسیار هەبوو.');
-        }
-    } catch (error) {
-        alert('کێشەیەک لە پەیوەندیگرتن بە سێرڤەر هەبوو.');
     }
 });
