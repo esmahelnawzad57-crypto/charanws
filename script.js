@@ -1,3 +1,33 @@
+// --- ئەم بەشە زیاد بکە بۆ ناردنی پرسیار ---
+async function sendQuestionToAll() {
+    const questionText = document.getElementById('questionInput').value.trim();
+    if (!questionText) return alert("تکایە سەرەتا پرسیارێک بنووسە!");
+
+    const res = await fetch('/api/game', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'start_game', question: questionText })
+    });
+    
+    if ((await res.json()).success) {
+        alert("✅ لینکەکان بۆ هەمووان نێردران!");
+    } else {
+        alert("❌ کێشەیەک لە ناردندا هەبوو.");
+    }
+}
+
+// --- ئەم بەشەش بۆ دروستکردنی پرسیار بە AI ---
+async function generateAIQuestion() {
+    const res = await fetch('/api/game', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'generate_question' })
+    });
+    const data = await res.json();
+    document.getElementById('questionInput').value = data.question;
+}
+
+// --- کۆدی خۆت (کە پێشتر ناردت) ---
 window.onload = function() {
     const params = new URLSearchParams(window.location.search);
     if (params.get('q') && params.get('n')) {
