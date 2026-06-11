@@ -1,14 +1,13 @@
 let currentFriendName = "";
 let currentQuestion = "";
 
-// کاتێک پەیجەکە دەکرێتەوە، پشکنین دەکات بزانێت کێ کردوویەتیەوە
+// پشکنینی پەیج لە کاتی کردنەوەدا
 window.onload = function() {
     const urlParams = new URLSearchParams(window.location.search);
-    const qParam = urlParams.get('q'); // گرتنی پرسیارەکە
-    const nParam = urlParams.get('n'); // گرتنی ناوی هاوڕێکە (n وەک ئەوەی لە API نووسیوتە)
+    const qParam = urlParams.get('q');
+    const nParam = urlParams.get('n');
 
     if (qParam && nParam) {
-        // ئەگەر هاوڕێیەک بێت: شاشەی ئەدمین دەشارێتەوە و شاشەی هاوڕێ پیشان دەدات
         document.getElementById('adminSection').style.display = 'none';
         document.getElementById('friendSection').style.display = 'block';
         
@@ -42,7 +41,7 @@ async function generateAIQuestion() {
     }
 }
 
-// ٢. ناردنی پرسیار بۆ هاوڕێکان لە تێلێگرام
+// ٢. ناردنی پرسیار بۆ تێلێگرامی هاوڕێکان
 async function sendQuestionToAll() {
     const questionText = document.getElementById('questionInput').value.trim();
     const statusBox = document.getElementById('statusMessage');
@@ -77,19 +76,24 @@ async function sendQuestionToAll() {
     }
 }
 
-// ٣. کاتێک هاوڕێیەک وەڵام دەداتەوە و دەنێردرێت بۆ Pipedream
+// ٣. ناردنی دەنگ و هۆکارەکەی بۆ Pipedream
 async function submitFriendAnswer() {
-    const answerText = document.getElementById('answerInput').value.trim();
+    const votedFriend = document.getElementById('votedFriendSelect').value;
+    const reasonText = document.getElementById('reasonInput').value.trim();
     const statusBox = document.getElementById('statusMessage');
     
-    if (!answerText) {
-        alert("تکایە وەڵامەکەت بنووسە!");
+    if (!votedFriend) {
+        alert("تکایە سەرەتا هاوڕێیەک لە لیستەکە هەڵبژێرە!");
+        return;
+    }
+    if (!reasonText) {
+        alert("تکایە بنووسە بۆچی ئەم کەسەت هەڵبژاردووە!");
         return;
     }
 
     statusBox.style.display = "block";
     statusBox.className = "status-box info";
-    statusBox.innerText = "⏳ وەڵامەکەت خەریکە تۆمار دەکرێت...";
+    statusBox.innerText = "⏳ وەڵامەکەت خەریکە بۆ AI ڕەوانە دەکرێت...";
 
     try {
         const response = await fetch('/api/game', {
@@ -99,15 +103,17 @@ async function submitFriendAnswer() {
                 action: 'submit_answer', 
                 friendName: currentFriendName, 
                 origQuestion: currentQuestion, 
-                answer: answerText 
+                votedFriend: votedFriend,      
+                reason: reasonText             
             })
         });
         const data = await response.json();
         
         if (data.success) {
             statusBox.className = "status-box success";
-            statusBox.innerText = "🎉 سوپاس! وەڵامەکەت بە سەرکەوتوویی نێردرا.";
-            document.getElementById('answerInput').disabled = true;
+            statusBox.innerText = "🎉 سوپاس! وەڵامەکەت تۆمارکرا و نێردرا بۆ Pipedream.";
+            document.getElementById('votedFriendSelect').disabled = true;
+            document.getElementById('reasonInput').disabled = true;
             document.getElementById('submitBtn').disabled = true;
         } else {
             statusBox.className = "status-box error";
