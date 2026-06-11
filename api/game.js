@@ -20,47 +20,39 @@ module.exports = async (req, res) => {
         const body = req.body;
 
         if (body.action === "generate_question") {
-            const sampleQuestions = [
-                "ئەگەر فڕۆکەکەتان تێکبچێت و تەنها ٦ چاکەتی فریاکەوتن هەبێت، کێ فڕێ دەدەنە خوارەوە و بۆچی؟",
-                "ئەگەر لە بیابانێکدا بن و تەنها یەک قوم ئاو مابێت، کێ دەکوژن بۆ ئەوەی ئاوەکە بۆ خۆتان بێت؟",
-                "ئەگەر زۆمبی هێرش بکات، کێ دەکەنە قوربانی بۆ ئەوەی خۆتان ڕزگار بکەن؟"
+            const questions = [
+                "ئەگەر زۆمبی هێرش بکات، کێ دەکەنە قوربانی بۆ ئەوەی خۆتان ڕزگار بکەن؟",
+                "ئەگەر فڕۆکەکەتان تێکبچێت و تەنها یەک چاکەتی فریاکەوتن هەبێت، کێ فڕێ دەدەنە خوارەوە؟"
             ];
-            const randomQuestion = sampleQuestions[Math.floor(Math.random() * sampleQuestions.length)];
-            return res.status(200).json({ question: randomQuestion });
+            return res.status(200).json({ question: questions[Math.floor(Math.random() * questions.length)] });
         }
 
         if (body.action === "start_game") {
             for (const friend of FRIENDS) {
-                const answerLink = `https://project-k13a3.vercel.app/?q=${encodeURIComponent(body.question)}&n=${encodeURIComponent(friend.name)}`;
-                
+                const link = `https://project-k13a3.vercel.app/?q=${encodeURIComponent(body.question)}&n=${encodeURIComponent(friend.name)}`;
                 await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ 
-                        chat_id: friend.id, 
-                        text: `🚨 یاری نوێ دەستی پێکرد!\n\n❓ پرسیار:\n"${body.question}"\n\n👇 خێرا لێرەوە کەسێک تاوانبار بکە و وەڵام بدەرەوە:\n${answerLink}` 
-                    })
+                    body: JSON.stringify({ chat_id: friend.id, text: `🚨 پرسیار:\n"${body.question}"\n\nوڵام بدەرەوە:\n${link}` })
                 });
             }
             return res.status(200).json({ success: true });
         }
 
         if (body.action === "submit_answer") {
+            // ئەگەر داتا نەهاتبوو بەتاڵ نەبێت
             await fetch(PIPEDREAM_WEBHOOK_URL, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    friendName: body.friendName,
-                    origQuestion: body.origQuestion,
-                    votedFriend: body.votedFriend,
-                    reason: body.reason
+                    friendName: body.friendName || "نادیار",
+                    origQuestion: body.origQuestion || "پرسیار نییە",
+                    votedFriend: body.votedFriend || "نادیار",
+                    reason: body.reason || "هۆکار نییە"
                 })
             });
             return res.status(200).json({ success: true });
         }
-
         return res.status(400).json({ error: 'Bad Request' });
-    } catch (e) { 
-        return res.status(500).json({ error: e.message }); 
-    }
+    } catch (e) { return res.status(500).json({ error: e.message }); }
 };
